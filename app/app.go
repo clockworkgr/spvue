@@ -86,6 +86,9 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+	"github.com/clockworkgr/spvue/x/blog"
+	blogkeeper "github.com/clockworkgr/spvue/x/blog/keeper"
+	blogtypes "github.com/clockworkgr/spvue/x/blog/types"
 )
 
 const Name = "spvue"
@@ -133,6 +136,7 @@ var (
 		vesting.AppModuleBasic{},
 		spvue.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		blog.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -201,6 +205,8 @@ type App struct {
 	spvueKeeper spvuekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
+	blogKeeper blogkeeper.Keeper
+
 	// the module manager
 	mm *module.Manager
 }
@@ -230,6 +236,7 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		spvuetypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
+		blogtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -325,6 +332,13 @@ func New(
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
+	app.blogKeeper = *blogkeeper.NewKeeper(
+		appCodec,
+		keys[blogtypes.StoreKey],
+		keys[blogtypes.MemStoreKey],
+	)
+	blogModule := blog.NewAppModule(appCodec, app.blogKeeper)
+
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,
@@ -367,6 +381,7 @@ func New(
 		transferModule,
 		spvue.NewAppModule(appCodec, app.spvueKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
+		blogModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -401,6 +416,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		spvuetypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
+		blogtypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -583,6 +599,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(blogtypes.ModuleName)
 
 	return paramsKeeper
 }

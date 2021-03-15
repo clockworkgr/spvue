@@ -1,9 +1,13 @@
 <template>
 	<div>
 		<div class="container">
+			<div v-if="address">
 			<SpTokenSend :address="address" />
 			<SpTransferList :address="address" />
-			<!-- this line is used by starport scaffolding # 4 -->
+			</div>
+			<div v-else>
+				Welcome
+			</div>
 		</div>
 	</div>
 </template>
