@@ -15,12 +15,6 @@ const routes = [
 		component: Index
 	},
 	{ path: '/types', component: Types },
-	{ path: '/address/:address', component: Address },
-	{ path: '/block/:block', component: Block },
-	{ path: '/blocks/:page?', component: Blocks },
-	{ path: '/send/', component: Send },
-	{ path: '/wallet/', component: Wallet },
-	{ path: '/legacy/', component: Legacy }
 ]
 
 const router = createRouter({
